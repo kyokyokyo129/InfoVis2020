@@ -1,0 +1,71 @@
+<!-- Code from d3-graph-gallery.com -->
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+私が行っている研究でのある実験結果です。
+横軸が遺伝的アルゴリズムにおける世代数，縦軸が評価値です。   
+
+
+<script>
+// set the dimensions and margins of the graph
+var margin = {top: 10, right: 30, bottom: 30, left: 60},
+    width = 460 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+//Read the data
+d3.csv("https://kyokyokyo129.github.io/InfoVis2020/W12/Evaluation1.csv",
+  // When reading the csv, I must format variables:
+  function(d){
+    return { Generation : d.Generation, max : d.max }
+  },
+  // Now I can use this dataset:
+  function(data) {
+    // Add X axis
+    var x = d3.scaleLinear()
+      .domain( [1, 1000] )
+      .range([ 0, width ]);
+    svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+    // Add Y axis
+    var y = d3.scaleLinear()
+      .domain( [3, 5])
+      .range([ height, 0 ]);
+    svg.append("g")
+      .call(d3.axisLeft(y));
+    // Add the line
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "#ff0000")
+      .attr("stroke-width", 1.5)
+      .attr("d", d3.line()
+        .x(function(d) { return x(d.Generation) })
+        .y(function(d) { return y(d.max) })
+        )
+    // Add the points
+    svg
+      .append("g")
+      .selectAll("dot")
+      .data(data)
+      .enter()
+      .append("circle")
+        .attr("cx", function(d) { return x(d.Generation) } )
+        .attr("cy", function(d) { return y(d.max) } )
+        .attr("r", 1.5)
+        .attr("fill", "#ff0000")
+})
+</script>
